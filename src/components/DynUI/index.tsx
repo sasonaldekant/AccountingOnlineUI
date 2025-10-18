@@ -64,6 +64,7 @@ export const DynPage: React.FC<DynPageProps> = ({
 
 interface DynInputProps {
   label?: string;
+  name?: string;
   value?: string;
   onChange?: (value: string) => void;
   required?: boolean;
@@ -98,6 +99,7 @@ interface SelectOption { value: any; label: string; }
 
 interface DynSelectProps {
   label?: string;
+  name?: string;
   value?: any;
   onChange?: (value: any) => void;
   options?: SelectOption[];

@@ -264,12 +264,12 @@ export const PartnerForm: React.FC<PartnerFormProps> = ({ partnerId, onSave, onC
             />
             
             <DynInput
-              label="Mati\u010dni broj"
+              label="Matični broj"
               name="maticniBroj"
               value={formData.maticniBroj}
               onChange={(value) => handleInputChange('maticniBroj', value)}
               maxLength={20}
-              placeholder="Unesite mati\u010dni broj"
+              placeholder="Unesite matični broj"
             />
             
             <DynInput
