@@ -450,6 +450,7 @@ interface SelectOption {
 interface DynSelectProps {
   name?: string;
   label?: string;
+  name?: string;
   value?: any;
   onChange?: (value: any) => void;
   options?: SelectOption[];

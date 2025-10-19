@@ -27,7 +27,7 @@ export const PartnerForm: React.FC<PartnerFormProps> = ({ partnerId, onSave, onC
     clearError
   } = usePartnerStore();
 
-  const [formData, setFormData] = useState<PartnerCreateDto>({
+  const [formData, setFormData] = useState({
     sifraPartner: '',
     nazivPartnera: '',
     adresa: '',
@@ -35,7 +35,7 @@ export const PartnerForm: React.FC<PartnerFormProps> = ({ partnerId, onSave, onC
     pib: '',
     telefon: '',
     fax: '',
-    idReferent: undefined,
+    idReferent: undefined as number | undefined,
     napomena: '',
     kontakt: '',
     idStatus: 1,
@@ -45,19 +45,19 @@ export const PartnerForm: React.FC<PartnerFormProps> = ({ partnerId, onSave, onC
     idNacinPlacanja: undefined,
     idCenovnaGrupa: undefined,
     konto: '',
-    idPartnerGlavni: undefined,
+    idPartnerGlavni: undefined as number | undefined,
     pdvBroj: '',
     maticniBroj: '',
     sifraSort: '',
     idVrstaPartnera: 1,
-    proizvodjac: undefined,
+    proizvodjac: undefined as number | undefined,
     brojUgovora: '',
     datumUgovora: undefined,
     kredit: 0,          // RSD - koristićemo currency input
     datumOtvaranja: undefined,
     njihovaSifraZaNas: '',
     bezZabrane: 0,
-    tolerancijaValute: undefined,
+    tolerancijaValute: undefined as number | undefined,
     odlozenoPlacanje: false,
     kategorijaKupca: '',
     staraSifra: ''
@@ -66,8 +66,25 @@ export const PartnerForm: React.FC<PartnerFormProps> = ({ partnerId, onSave, onC
   const isEditMode = !!partnerId;
 
   useEffect(() => {
-    if (partnerId) {
-      loadPartnerById(partnerId);
+    if (partnerId) loadPartnerById(partnerId);
+  }, [partnerId, loadPartnerById]);
+
+  useEffect(() => {
+    if (selectedPartner && isEditMode) {
+      setFormData(prev => ({
+        ...prev,
+        ...selectedPartner,
+        datumUgovora: selectedPartner.datumUgovora
+          ? typeof selectedPartner.datumUgovora === 'string'
+            ? selectedPartner.datumUgovora
+            : (selectedPartner.datumUgovora as Date).toISOString().slice(0, 10)
+          : undefined,
+        datumOtvaranja: selectedPartner.datumOtvaranja
+          ? typeof selectedPartner.datumOtvaranja === 'string'
+            ? selectedPartner.datumOtvaranja
+            : (selectedPartner.datumOtvaranja as Date).toISOString().slice(0, 10)
+          : undefined
+      }));
     }
   }, [partnerId, loadPartnerById]);
 
@@ -87,13 +104,21 @@ export const PartnerForm: React.FC<PartnerFormProps> = ({ partnerId, onSave, onC
   const handleSubmit = async () => {
     try {
       clearError();
-      let savedPartner: Partner;
-      
+      let saved: Partner;
       if (isEditMode && partnerId) {
-        const updateDto: PartnerUpdateDto = { ...formData, idPartner: partnerId };
-        savedPartner = await updatePartner(partnerId, updateDto);
+        const dto: PartnerUpdateDto = {
+          ...formData,
+          idPartner: partnerId,
+          datumUgovora: formData.datumUgovora ? new Date(formData.datumUgovora) : undefined,
+          datumOtvaranja: formData.datumOtvaranja ? new Date(formData.datumOtvaranja) : undefined
+        };
+        saved = await updatePartner(partnerId, dto);
       } else {
-        savedPartner = await createPartner(formData);
+        saved = await createPartner({
+          ...formData,
+          datumUgovora: formData.datumUgovora ? new Date(formData.datumUgovora) : undefined,
+          datumOtvaranja: formData.datumOtvaranja ? new Date(formData.datumOtvaranja) : undefined
+        });
       }
       
       onSave?.(savedPartner);
@@ -372,7 +397,6 @@ export const PartnerForm: React.FC<PartnerFormProps> = ({ partnerId, onSave, onC
             placeholder="Dodatne informacije o partneru, uslovi saradnje, kontakt detalji..."
             help="Opcionalne napomene i komentari (maksimalno 500 karaktera)"
           />
-        </DynFieldContainer>
 
         {/* === FORM ACTIONS === */}
         <div className="flex justify-end space-x-4 mt-8 pt-6 border-t border-gray-200">
