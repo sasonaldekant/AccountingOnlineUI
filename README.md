@@ -19,6 +19,7 @@
 ## 📋 Quick Start
 
 ### 1. Clone & Install
+
 ```bash
 git clone https://github.com/sasonaldekant/AccountingOnlineUI.git
 cd AccountingOnlineUI
@@ -27,18 +28,21 @@ npm install
 ```
 
 ### 2. Environment Configuration
+
 ```bash
 # Create .env file
 echo "REACT_APP_API_URL=https://localhost:7000/api" > .env
 ```
 
 ### 3. Development
+
 ```bash
 npm start
 # App runs on http://localhost:3000
 ```
 
 ### 4. Build Production
+
 ```bash
 npm run build
 ```
@@ -67,12 +71,14 @@ src/
 ## 🎯 Milestone 2 Implementation Status
 
 ### ✅ **Implemented Files:**
+
 - **partner.types.ts** - TypeScript interfaces (37 fields)
 - **partnerApi.ts** - API service sa Axios
 - **partnerStore.ts** - Zustand state management
 - **PartnerForm.tsx** - DYN-UI form component
 
 ### 🔄 **TODO Files:**
+
 - **DynUI/index.tsx** - Mock DYN-UI komponente
 - **PartnerListScreen.tsx** - Partner grid view
 - **App.tsx** - Main app sa navigation
@@ -83,11 +89,13 @@ src/
 ## 🔌 Backend Integration
 
 ### Prerequisites
+
 1. **AccountingOnline** backend running sa JSON Repository
 2. **API endpoints** dostupni na `https://localhost:7000/api`
 3. **CORS** konfigurisan za React development server
 
 ### API Endpoints
+
 - `GET /api/partners` - Lista svih partnera  
 - `GET /api/partners/{id}` - Partner po ID
 - `POST /api/partners` - Kreiranje partnera
@@ -100,6 +108,7 @@ src/
 ## 🎨 DYN-UI Components
 
 ### Mock Implementation (In Progress)
+
 - **DynPage** - Page wrapper sa breadcrumbs
 - **DynGrid** - Data table sa sorting/filtering
 - **DynInput** - Input komponente sa validation
@@ -108,6 +117,7 @@ src/
 - **DynFieldContainer** - Form section grouping
 
 ### Production Migration
+
 Zameni mock komponente sa pravim `@dyn-ui/react` library:
 
 ```tsx
@@ -123,6 +133,7 @@ import { DynPage, DynInput, DynGrid } from '@dyn-ui/react';
 ## 🔄 Database Compliance
 
 ### 100% Field Mapping
+
 Svi Partner polja su **exact match** sa tblPartner SQL schema (37 polja).
 
 ---
