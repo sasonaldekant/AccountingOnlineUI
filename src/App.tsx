@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import '@dyn-ui/design-tokens/index.css';
 import { PartnerListScreen } from './screens/PartnerListScreen';
 import { PartnerForm } from './components/PartnerForm';
 import { Partner } from './types/partner.types';

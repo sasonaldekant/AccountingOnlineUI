@@ -5,63 +5,45 @@ import path from 'path'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  
-  // Development server configuration
-  server: {
-    port: 5173,
-    open: true, // Automatically open browser
-    host: true, // Allow external access
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+      '@/components': path.resolve(__dirname, './src/components'),
+      '@/screens': path.resolve(__dirname, './src/screens'),
+      '@/services': path.resolve(__dirname, './src/services'),
+      '@/stores': path.resolve(__dirname, './src/stores'),
+      '@/types': path.resolve(__dirname, './src/types'),
+      '@/utils': path.resolve(__dirname, './src/utils')
+    }
   },
-  
-  // Build configuration
+  server: {
+    port: 3000,
+    open: true,
+    cors: true,
+    proxy: {
+      '/api': {
+        target: 'https://localhost:7000',
+        changeOrigin: true,
+        secure: false
+      }
+    }
+  },
   build: {
     outDir: 'dist',
     sourcemap: true,
-    minify: 'terser',
-    target: 'esnext',
     rollupOptions: {
       output: {
         manualChunks: {
-          'vendor': ['react', 'react-dom'],
-          'store': ['zustand'],
-          'http': ['axios']
+          vendor: ['react', 'react-dom'],
+          router: ['react-router-dom'],
+          state: ['zustand'],
+          http: ['axios'],
+          ui: ['@dyn-ui/react']
         }
       }
     }
   },
-  
-  // Path resolution
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
-      '@components': path.resolve(__dirname, './src/components'),
-      '@stores': path.resolve(__dirname, './src/stores'),
-      '@types': path.resolve(__dirname, './src/types'),
-      '@services': path.resolve(__dirname, './src/services'),
-    }
-  },
-  
-  // Environment variables prefix
-  envPrefix: 'VITE_',
-  
-  // CSS configuration
-  css: {
-    postcss: {
-      plugins: [
-        require('tailwindcss'),
-        require('autoprefixer'),
-      ]
-    }
-  },
-  
-  // Optimizations
   optimizeDeps: {
-    include: [
-      'react',
-      'react-dom',
-      'zustand',
-      'axios',
-      'clsx'
-    ]
+    include: ['react', 'react-dom', '@dyn-ui/react']
   }
 })
