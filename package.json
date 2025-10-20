@@ -1,9 +1,9 @@
 {
   "name": "accounting-online-ui",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.3.0",
   "type": "module",
-  "description": "AccountingOnline ERP - DYN-UI React Frontend with Enhanced Mock Components (Vite + TypeScript)",
+  "description": "AccountingOnline ERP - Real DYN-UI React Frontend Migration",
   "author": "Sasonal Dekant <sasonal.dekant@gmail.com>",
   "license": "MIT",
   "keywords": [
@@ -24,10 +24,13 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
   },
   "dependencies": {
+    "@dyn-ui/react": "github:mgasic/dyn-ui#main",
     "axios": "^1.6.2",
+    "classnames": "^2.5.1",
     "clsx": "^2.0.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.20.1",
     "zustand": "^4.4.7"
   },
   "devDependencies": {
@@ -44,7 +47,7 @@
     "postcss": "^8.4.32",
     "tailwindcss": "^3.3.6",
     "typescript": "^5.2.2",
-    "vite": "^7.1.10"
+    "vite": "^5.0.8"
   },
   "engines": {
     "node": ">=18.0.0",
