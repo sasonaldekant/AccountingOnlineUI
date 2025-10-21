@@ -26,11 +26,11 @@ export const usePartnerStore = create<PartnerState>()(
   devtools(
     (set, get) => ({
       // Initial state
-      partners: [],
-      selectedPartner: null,
-      partnerCombo: [],
+      partners: [] as Partner[],
+      selectedPartner: null as Partner | null,
+      partnerCombo: [] as PartnerCombo[],
       loading: false,
-      error: null,
+      error: null as string | null,
 
       // Load all partners
       loadPartners: async () => {

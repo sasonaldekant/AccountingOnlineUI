@@ -1,17 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  DynPage, 
-  DynFieldContainer, 
-  DynInput, 
-  DynSelect, 
-  DynButton,
-  DynTextArea
-} from './DynUI';
+// Import basic DynUI components and their prop types
+// Temporarily removing DynUI components in favor of basic HTML while we fix type issues
 import { usePartnerStore } from '../stores/partnerStore';
 import type { Partner, PartnerCreateDto, PartnerUpdateDto } from '../types/partner.types';
 
 interface PartnerFormProps {
-  partnerId?: number;
+  partnerId?: number | undefined;
   onSave?: (partner: Partner) => void;
   onCancel?: () => void;
 }
@@ -27,7 +21,48 @@ export const PartnerForm: React.FC<PartnerFormProps> = ({ partnerId, onSave, onC
     clearError
   } = usePartnerStore();
 
-  const [formData, setFormData] = useState({
+  type FormState = {
+    // Required fields
+    sifraPartner: string;
+    nazivPartnera: string;
+    adresa: string;
+    idMesto: number;
+    pib: string;
+    telefon: string;
+    fax: string;
+    napomena: string;
+    kontakt: string;
+    idStatus: number;
+    idDrzava: number;
+    rabat: number;
+    kasa: number;
+    konto: string;
+    pdvBroj: string;
+    maticniBroj: string;
+    sifraSort: string;
+    idVrstaPartnera: number;
+    brojUgovora: string;
+    kredit: number;
+    njihovaSifraZaNas: string;
+    bezZabrane: number;
+    odlozenoPlacanje: boolean;
+    kategorijaKupca: string;
+    staraSifra: string;
+
+    // Optional fields with explicit undefined
+    idPartner?: number | undefined;
+    idReferent?: number | undefined;
+    idNacinPlacanja?: number | undefined;
+    idCenovnaGrupa?: number | undefined;
+    idPartnerGlavni?: number | undefined;
+    proizvodjac?: number | undefined;
+    datumUgovora?: string | undefined;
+    datumOtvaranja?: string | undefined;
+    tolerancijaValute?: number | undefined;
+  };
+
+  const [formData, setFormData] = useState<FormState>({
+    // Required fields
     sifraPartner: '',
     nazivPartnera: '',
     adresa: '',
@@ -35,32 +70,35 @@ export const PartnerForm: React.FC<PartnerFormProps> = ({ partnerId, onSave, onC
     pib: '',
     telefon: '',
     fax: '',
-    idReferent: undefined as number | undefined,
     napomena: '',
     kontakt: '',
     idStatus: 1,
     idDrzava: 1,
-    rabat: 0,           // % - koristićemo number input
-    kasa: 0,            // % - koristićemo number input  
-    idNacinPlacanja: undefined,
-    idCenovnaGrupa: undefined,
+    rabat: 0,
+    kasa: 0,
     konto: '',
-    idPartnerGlavni: undefined as number | undefined,
     pdvBroj: '',
     maticniBroj: '',
     sifraSort: '',
     idVrstaPartnera: 1,
-    proizvodjac: undefined as number | undefined,
     brojUgovora: '',
-    datumUgovora: undefined,
-    kredit: 0,          // RSD - koristićemo currency input
-    datumOtvaranja: undefined,
+    kredit: 0,
     njihovaSifraZaNas: '',
     bezZabrane: 0,
-    tolerancijaValute: undefined as number | undefined,
     odlozenoPlacanje: false,
     kategorijaKupca: '',
-    staraSifra: ''
+    staraSifra: '',
+    
+    // Optional fields
+    idPartner: undefined,
+    idReferent: undefined,
+    idNacinPlacanja: undefined,
+    idCenovnaGrupa: undefined,
+    idPartnerGlavni: undefined,
+    proizvodjac: undefined,
+    datumUgovora: undefined,
+    datumOtvaranja: undefined,
+    tolerancijaValute: undefined
   });
 
   const isEditMode = !!partnerId;
@@ -90,14 +128,50 @@ export const PartnerForm: React.FC<PartnerFormProps> = ({ partnerId, onSave, onC
 
   useEffect(() => {
     if (selectedPartner && isEditMode) {
-      setFormData(prev => ({
-        ...prev,
-        ...selectedPartner
-      }));
-    }
-  }, [selectedPartner, isEditMode]);
+      // Prepare form data from selected partner
+      const formData: FormState = {
+        // Required fields
+        sifraPartner: selectedPartner.sifraPartner,
+        nazivPartnera: selectedPartner.nazivPartnera,
+        adresa: selectedPartner.adresa || '',
+        idMesto: selectedPartner.idMesto,
+        pib: selectedPartner.pib,
+        telefon: selectedPartner.telefon || '',
+        fax: selectedPartner.fax || '',
+        napomena: selectedPartner.napomena || '',
+        kontakt: selectedPartner.kontakt || '',
+        idStatus: selectedPartner.idStatus,
+        idDrzava: selectedPartner.idDrzava || 1,
+        rabat: selectedPartner.rabat,
+        kasa: selectedPartner.kasa,
+        konto: selectedPartner.konto || '',
+        pdvBroj: selectedPartner.pdvBroj || '',
+        maticniBroj: selectedPartner.maticniBroj || '',
+        sifraSort: selectedPartner.sifraSort || '',
+        idVrstaPartnera: selectedPartner.idVrstaPartnera,
+        brojUgovora: selectedPartner.brojUgovora || '',
+        kredit: selectedPartner.kredit,
+        njihovaSifraZaNas: selectedPartner.njihovaSifraZaNas || '',
+        bezZabrane: selectedPartner.bezZabrane || 0,
+        odlozenoPlacanje: selectedPartner.odlozenoPlacanje || false,
+        kategorijaKupca: selectedPartner.kategorijaKupca || '',
+        staraSifra: selectedPartner.staraSifra || '',
 
-  // Type-safe field change handler
+        // Optional fields
+        idPartner: selectedPartner.idPartner,
+        idReferent: selectedPartner.idReferent,
+        idNacinPlacanja: selectedPartner.idNacinPlacanja,
+        idCenovnaGrupa: selectedPartner.idCenovnaGrupa,
+        idPartnerGlavni: selectedPartner.idPartnerGlavni,
+        proizvodjac: selectedPartner.proizvodjac,
+        datumUgovora: selectedPartner.datumUgovora ? new Date(selectedPartner.datumUgovora).toISOString().split('T')[0] : undefined,
+        datumOtvaranja: selectedPartner.datumOtvaranja ? new Date(selectedPartner.datumOtvaranja).toISOString().split('T')[0] : undefined,
+        tolerancijaValute: selectedPartner.tolerancijaValute
+      };
+
+      setFormData(formData);
+    }
+  }, [selectedPartner, isEditMode]);  // Type-safe field change handler
   const handleInputChange = (field: keyof PartnerCreateDto) => 
     (value: any) => setFormData(prev => ({ ...prev, [field]: value }));
 
@@ -105,320 +179,473 @@ export const PartnerForm: React.FC<PartnerFormProps> = ({ partnerId, onSave, onC
     try {
       clearError();
       let saved: Partner;
+
+      const commonData = {
+        // Required fields
+        sifraPartner: formData.sifraPartner,
+        nazivPartnera: formData.nazivPartnera,
+        adresa: formData.adresa,
+        idMesto: formData.idMesto,
+        pib: formData.pib,
+        telefon: formData.telefon,
+        fax: formData.fax,
+        napomena: formData.napomena,
+        kontakt: formData.kontakt,
+        idStatus: formData.idStatus,
+        idDrzava: formData.idDrzava,
+        rabat: formData.rabat,
+        kasa: formData.kasa,
+        konto: formData.konto,
+        pdvBroj: formData.pdvBroj,
+        maticniBroj: formData.maticniBroj,
+        sifraSort: formData.sifraSort,
+        idVrstaPartnera: formData.idVrstaPartnera,
+        brojUgovora: formData.brojUgovora,
+        kredit: formData.kredit,
+        njihovaSifraZaNas: formData.njihovaSifraZaNas,
+        bezZabrane: formData.bezZabrane,
+        odlozenoPlacanje: formData.odlozenoPlacanje,
+        kategorijaKupca: formData.kategorijaKupca,
+        staraSifra: formData.staraSifra,
+
+        // Convert optional fields to required format
+        idReferent: formData.idReferent ?? 0,
+        idNacinPlacanja: formData.idNacinPlacanja ?? 0,
+        idCenovnaGrupa: formData.idCenovnaGrupa ?? 0,
+        idPartnerGlavni: formData.idPartnerGlavni ?? 0,
+        proizvodjac: formData.proizvodjac ?? 0,
+        tolerancijaValute: formData.tolerancijaValute ?? 0,
+        datumUgovora: formData.datumUgovora ? new Date(formData.datumUgovora) : null,
+        datumOtvaranja: formData.datumOtvaranja ? new Date(formData.datumOtvaranja) : null
+      };
+
       if (isEditMode && partnerId) {
-        const dto: PartnerUpdateDto = {
-          ...formData,
-          idPartner: partnerId,
-          datumUgovora: formData.datumUgovora ? new Date(formData.datumUgovora) : undefined,
-          datumOtvaranja: formData.datumOtvaranja ? new Date(formData.datumOtvaranja) : undefined
-        };
-        saved = await updatePartner(partnerId, dto);
-      } else {
-        saved = await createPartner({
-          ...formData,
-          datumUgovora: formData.datumUgovora ? new Date(formData.datumUgovora) : undefined,
-          datumOtvaranja: formData.datumOtvaranja ? new Date(formData.datumOtvaranja) : undefined
+        saved = await updatePartner(partnerId, {
+          ...commonData,
+          idPartner: partnerId
         });
+      } else {
+        saved = await createPartner(commonData);
       }
       
-      onSave?.(savedPartner);
+      onSave?.(saved);
     } catch {
       // Error je u store-u
     }
   };
 
   const breadcrumbs = [
-    { label: 'Početna', href: '/' },
-    { label: 'Partneri', href: '/partneri' },
-    { label: isEditMode ? 'Izmeni partnera' : 'Novi partner' }
+    { title: 'Početna', href: '/' },
+    { title: 'Partneri', href: '/partneri' },
+    { title: isEditMode ? 'Izmeni partnera' : 'Novi partner' }
   ];
 
   return (
-    <DynPage
-      title={isEditMode ? 'Izmeni partnera' : 'Novi partner'}
-      breadcrumbs={breadcrumbs}
-      loading={loading}
-      error={error}
-      onErrorDismiss={clearError}
-    >
-      <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
-        
-        {/* === OSNOVNI PODACI === */}
-        <DynFieldContainer title="Osnovni podaci">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <DynInput
-              name="sifraPartner"
-              label="Šifra partnera"
-              type="text"
-              required
-              maxLength={20}
-              value={formData.sifraPartner}
-              onChange={handleInputChange('sifraPartner')}
-              validation={[
-                { type: 'required', message: 'Šifra partnera je obavezna' },
-                { type: 'pattern', value: '^[A-Z0-9\\-_/]+$', message: 'Dozvoljeni su velika slova, brojevi i -_/' }
-              ]}
-              placeholder="npr. P001, PARTNER-123"
-              help="Jedinstveni kod partnera u sistemu"
-            />
-            
-            <DynInput
-              name="nazivPartnera"
-              label="Naziv partnera"
-              type="text"
-              required
-              maxLength={100}
-              value={formData.nazivPartnera}
-              onChange={handleInputChange('nazivPartnera')}
-              validation={[
-                { type: 'required', message: 'Naziv partnera je obavezan' },
-                { type: 'minLength', value: 2, message: 'Minimum 2 karaktera' }
-              ]}
-              placeholder="Unesite naziv partnera"
-            />
-            
-            <DynInput
-              name="adresa"
-              label="Adresa"
-              type="text"
-              maxLength={100}
-              value={formData.adresa}
-              onChange={handleInputChange('adresa')}
-              placeholder="Unesite adresu"
-            />
-            
-            <DynSelect
-              name="idMesto"
-              label="Mesto"
-              required
-              value={formData.idMesto}
-              onChange={handleInputChange('idMesto')}
-              options={[
-                { value: 1, label: 'Beograd' },
-                { value: 2, label: 'Novi Sad' },
-                { value: 3, label: 'Niš' },
-                { value: 4, label: 'Kragujevac' },
-                { value: 5, label: 'Subotica' }
-              ]}
-              validation={[
-                { type: 'required', message: 'Mesto je obavezno' }
-              ]}
-            />
+    <div className="container mx-auto px-4 py-8">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold">
+          {isEditMode ? 'Izmeni partnera' : 'Novi partner'}
+        </h1>
+        <nav className="mt-2">
+          <ol className="list-none p-0 inline-flex">
+            {breadcrumbs.map((crumb, index) => (
+              <li key={index} className="flex items-center">
+                {index > 0 && <span className="mx-2">/</span>}
+                {crumb.href ? (
+                  <a href={crumb.href} className="text-blue-600 hover:text-blue-800">
+                    {crumb.title}
+                  </a>
+                ) : (
+                  <span className="text-gray-500">{crumb.title}</span>
+                )}
+              </li>
+            ))}
+          </ol>
+        </nav>
+      </div>
+
+      {loading && <div className="text-center py-4">Loading...</div>}
+      
+      {error && (
+        <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-8">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <p className="text-sm text-red-700">{error}</p>
+            </div>
+            <div className="ml-auto pl-3">
+              <div className="-mx-1.5 -my-1.5">
+                <button
+                  onClick={clearError}
+                  className="inline-flex rounded-md p-1.5 text-red-500 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                >
+                  <span className="sr-only">Dismiss</span>
+                  <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </button>
+              </div>
+            </div>
           </div>
-        </DynFieldContainer>
+        </div>
+      )}
+
+      <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} className="space-y-8">
+        {/* === OSNOVNI PODACI === */}
+        <fieldset className="border rounded-md p-4">
+          <legend className="text-lg font-medium px-2">Osnovni podaci</legend>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="sifraPartner" className="block text-sm font-medium text-gray-700">
+                Šifra partnera <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                id="sifraPartner"
+                name="sifraPartner"
+                required
+                maxLength={20}
+                value={formData.sifraPartner}
+                onChange={(e) => handleInputChange('sifraPartner')(e.target.value)}
+                placeholder="npr. P001, PARTNER-123"
+                pattern="[A-Z0-9\-_/]+"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+              />
+              <p className="mt-1 text-sm text-gray-500">Jedinstveni kod partnera u sistemu</p>
+            </div>
+
+            <div>
+              <label htmlFor="nazivPartnera" className="block text-sm font-medium text-gray-700">
+                Naziv partnera <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                id="nazivPartnera"
+                name="nazivPartnera"
+                required
+                minLength={2}
+                maxLength={100}
+                value={formData.nazivPartnera}
+                onChange={(e) => handleInputChange('nazivPartnera')(e.target.value)}
+                placeholder="Unesite naziv partnera"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="adresa" className="block text-sm font-medium text-gray-700">
+                Adresa
+              </label>
+              <input
+                type="text"
+                id="adresa"
+                name="adresa"
+                maxLength={100}
+                value={formData.adresa}
+                onChange={(e) => handleInputChange('adresa')(e.target.value)}
+                placeholder="Unesite adresu"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="idMesto" className="block text-sm font-medium text-gray-700">
+                Mesto <span className="text-red-500">*</span>
+              </label>
+              <select
+                id="idMesto"
+                name="idMesto"
+                required
+                value={formData.idMesto}
+                onChange={(e) => handleInputChange('idMesto')(Number(e.target.value))}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+              >
+                <option value={1}>Beograd</option>
+                <option value={2}>Novi Sad</option>
+                <option value={3}>Niš</option>
+                <option value={4}>Kragujevac</option>
+                <option value={5}>Subotica</option>
+              </select>
+            </div>
+          </div>
+        </fieldset>
 
         {/* === KONTAKT PODACI === */}
-        <DynFieldContainer title="Kontakt podaci">
+        <fieldset className="border rounded-md p-4">
+          <legend className="text-lg font-medium px-2">Kontakt podaci</legend>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <DynInput
-              name="pib"
-              label="PIB"
-              type="text"
-              required
-              maxLength={20}
-              value={formData.pib}
-              onChange={handleInputChange('pib')}
-              validation={[
-                { type: 'required', message: 'PIB je obavezan' },
-                { type: 'pattern', value: '^[0-9]{9}$', message: 'PIB mora imati tačno 9 cifara' }
-              ]}
-              placeholder="123456789"
-              help="Poreski identifikacioni broj (9 cifara)"
-            />
+            <div>
+              <label htmlFor="pib" className="block text-sm font-medium text-gray-700">
+                PIB <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                id="pib"
+                name="pib"
+                required
+                maxLength={20}
+                pattern="[0-9]{9}"
+                value={formData.pib}
+                onChange={(e) => handleInputChange('pib')(e.target.value)}
+                placeholder="123456789"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+              />
+              <p className="mt-1 text-sm text-gray-500">Poreski identifikacioni broj (9 cifara)</p>
+            </div>
             
-            <DynInput
-              name="telefon"
-              label="Telefon"
-              type="tel"
-              maxLength={30}
-              value={formData.telefon}
-              onChange={handleInputChange('telefon')}
-              placeholder="+381 11 123 4567"
-            />
+            <div>
+              <label htmlFor="telefon" className="block text-sm font-medium text-gray-700">
+                Telefon
+              </label>
+              <input
+                type="tel"
+                id="telefon"
+                name="telefon"
+                maxLength={30}
+                value={formData.telefon}
+                onChange={(e) => handleInputChange('telefon')(e.target.value)}
+                placeholder="+381 11 123 4567"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+              />
+            </div>
             
-            <DynInput
-              name="fax"
-              label="FAX"
-              type="tel"
-              maxLength={30}
-              value={formData.fax}
-              onChange={handleInputChange('fax')}
-              placeholder="+381 11 123 4568"
-            />
+            <div>
+              <label htmlFor="fax" className="block text-sm font-medium text-gray-700">
+                FAX
+              </label>
+              <input
+                type="tel"
+                id="fax"
+                name="fax"
+                maxLength={30}
+                value={formData.fax}
+                onChange={(e) => handleInputChange('fax')(e.target.value)}
+                placeholder="+381 11 123 4568"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+              />
+            </div>
             
-            <DynInput
-              name="kontakt"
-              label="Kontakt osoba"
-              type="text"
-              maxLength={100}
-              value={formData.kontakt}
-              onChange={handleInputChange('kontakt')}
-              placeholder="Ime i prezime kontakt osobe"
-            />
+            <div>
+              <label htmlFor="kontakt" className="block text-sm font-medium text-gray-700">
+                Kontakt osoba
+              </label>
+              <input
+                type="text"
+                id="kontakt"
+                name="kontakt"
+                maxLength={100}
+                value={formData.kontakt}
+                onChange={(e) => handleInputChange('kontakt')(e.target.value)}
+                placeholder="Ime i prezime kontakt osobe"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+              />
+            </div>
           </div>
-        </DynFieldContainer>
+        </fieldset>
 
         {/* === POSLOVNI PODACI === */}
-        <DynFieldContainer title="Poslovni podaci">
+        <fieldset className="border rounded-md p-4">
+          <legend className="text-lg font-medium px-2">Poslovni podaci</legend>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <DynSelect
-              name="idStatus"
-              label="Status"
-              required
-              value={formData.idStatus}
-              onChange={handleInputChange('idStatus')}
-              options={[
-                { value: 1, label: 'Aktivan' },
-                { value: 2, label: 'Neaktivan' },
-                { value: 3, label: 'Blokiran' }
-              ]}
-            />
+            <div>
+              <label htmlFor="idStatus" className="block text-sm font-medium text-gray-700">
+                Status <span className="text-red-500">*</span>
+              </label>
+              <select
+                id="idStatus"
+                name="idStatus"
+                required
+                value={formData.idStatus}
+                onChange={(e) => handleInputChange('idStatus')(Number(e.target.value))}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+              >
+                <option value={1}>Aktivan</option>
+                <option value={2}>Neaktivan</option>
+                <option value={3}>Blokiran</option>
+              </select>
+            </div>
             
-            <DynSelect
-              name="idVrstaPartnera"
-              label="Vrsta partnera"
-              required
-              value={formData.idVrstaPartnera}
-              onChange={handleInputChange('idVrstaPartnera')}
-              options={[
-                { value: 1, label: 'Dobavljač' },
-                { value: 2, label: 'Kupac' },
-                { value: 3, label: 'Prevoznik' },
-                { value: 4, label: 'Uslužni partner' }
-              ]}
-            />
+            <div>
+              <label htmlFor="idVrstaPartnera" className="block text-sm font-medium text-gray-700">
+                Vrsta partnera <span className="text-red-500">*</span>
+              </label>
+              <select
+                id="idVrstaPartnera"
+                name="idVrstaPartnera"
+                required
+                value={formData.idVrstaPartnera}
+                onChange={(e) => handleInputChange('idVrstaPartnera')(Number(e.target.value))}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+              >
+                <option value={1}>Dobavljač</option>
+                <option value={2}>Kupac</option>
+                <option value={3}>Prevoznik</option>
+                <option value={4}>Uslužni partner</option>
+              </select>
+            </div>
             
-            {/* Rabat - number input sa spin buttons i procenat validacija */}
-            <DynInput
-              name="rabat"
-              label="Rabat (%)"
-              type="number"
-              min={0}
-              max={100}
-              step={0.1}
-              showSpinButtons
-              value={formData.rabat}
-              onChange={handleInputChange('rabat')}
-              validation={[
-                { type: 'custom', message: 'Rabat mora biti između 0 i 100%', 
-                  validator: (value) => value >= 0 && value <= 100 }
-              ]}
-              help="Standardni rabat za partnera (0-100%)"
-            />
+            <div>
+              <label htmlFor="rabat" className="block text-sm font-medium text-gray-700">
+                Rabat (%)
+              </label>
+              <input
+                type="number"
+                id="rabat"
+                name="rabat"
+                min={0}
+                max={100}
+                step={0.1}
+                value={formData.rabat}
+                onChange={(e) => {
+                  const value = Number(e.target.value);
+                  if (value >= 0 && value <= 100) {
+                    handleInputChange('rabat')(value);
+                  }
+                }}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+              />
+              <p className="mt-1 text-sm text-gray-500">Standardni rabat za partnera (0-100%)</p>
+            </div>
             
-            {/* Kasa - number input sa spin buttons */}
-            <DynInput
-              name="kasa"
-              label="Kasa (%)"
-              type="number"
-              min={0}
-              step={0.01}
-              showSpinButtons
-              value={formData.kasa}
-              onChange={handleInputChange('kasa')}
-              help="Procenat kase za partnera"
-            />
+            <div>
+              <label htmlFor="kasa" className="block text-sm font-medium text-gray-700">
+                Kasa (%)
+              </label>
+              <input
+                type="number"
+                id="kasa"
+                name="kasa"
+                min={0}
+                step={0.01}
+                value={formData.kasa}
+                onChange={(e) => handleInputChange('kasa')(Number(e.target.value))}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+              />
+              <p className="mt-1 text-sm text-gray-500">Procenat kase za partnera</p>
+            </div>
           </div>
-        </DynFieldContainer>
+        </fieldset>
 
         {/* === DODATNI PODACI === */}
-        <DynFieldContainer title="Dodatni podaci">
+        <fieldset className="border rounded-md p-4">
+          <legend className="text-lg font-medium px-2">Dodatni podaci</legend>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <DynInput
-              name="pdvBroj"
-              label="PDV broj"
-              type="text"
-              maxLength={20}
-              value={formData.pdvBroj}
-              onChange={handleInputChange('pdvBroj')}
-              placeholder="RS123456789"
-              help="Broj za PDV (ako je obveznik)"
-            />
+            <div>
+              <label htmlFor="pdvBroj" className="block text-sm font-medium text-gray-700">
+                PDV broj
+              </label>
+              <input
+                type="text"
+                id="pdvBroj"
+                name="pdvBroj"
+                maxLength={20}
+                value={formData.pdvBroj}
+                onChange={(e) => handleInputChange('pdvBroj')(e.target.value)}
+                placeholder="RS123456789"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+              />
+              <p className="mt-1 text-sm text-gray-500">Broj za PDV (ako je obveznik)</p>
+            </div>
             
-            <DynInput
-              name="maticniBroj"
-              label="Matični broj"
-              type="text"
-              maxLength={20}
-              value={formData.maticniBroj}
-              onChange={handleInputChange('maticniBroj')}
-              validation={[
-                { type: 'pattern', value: '^[0-9]{8}$', message: 'Matični broj mora imati tačno 8 cifara' }
-              ]}
-              placeholder="12345678"
-              help="Matični broj privrednog subjekta (8 cifara)"
-            />
+            <div>
+              <label htmlFor="maticniBroj" className="block text-sm font-medium text-gray-700">
+                Matični broj
+              </label>
+              <input
+                type="text"
+                id="maticniBroj"
+                name="maticniBroj"
+                maxLength={20}
+                pattern="[0-9]{8}"
+                value={formData.maticniBroj}
+                onChange={(e) => handleInputChange('maticniBroj')(e.target.value)}
+                placeholder="12345678"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+              />
+              <p className="mt-1 text-sm text-gray-500">Matični broj privrednog subjekta (8 cifara)</p>
+            </div>
             
-            <DynInput
-              name="konto"
-              label="Konto"
-              type="text"
-              maxLength={10}
-              value={formData.konto}
-              onChange={handleInputChange('konto')}
-              placeholder="4301"
-              help="Kontni broj u kontnom planu"
-            />
+            <div>
+              <label htmlFor="konto" className="block text-sm font-medium text-gray-700">
+                Konto
+              </label>
+              <input
+                type="text"
+                id="konto"
+                name="konto"
+                maxLength={10}
+                value={formData.konto}
+                onChange={(e) => handleInputChange('konto')(e.target.value)}
+                placeholder="4301"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+              />
+              <p className="mt-1 text-sm text-gray-500">Kontni broj u kontnom planu</p>
+            </div>
             
             {/* Kredit - currency input sa RSD formatting */}
-            <DynInput
-              name="kredit"
-              label="Kredit limit"
-              type="currency"
-              currencyConfig={{
-                currency: 'RSD',
-                precision: 2,
-                thousandSeparator: '.',
-                decimalSeparator: ',',
-                showCurrencySymbol: true,
-                currencyPosition: 'after',
-                autoFormat: true,
-                allowNegative: false
-              }}
-              value={formData.kredit}
-              onChange={handleInputChange('kredit')}
-              help="Maksimalni kredit za partnera u RSD"
-            />
+            <div>
+              <label htmlFor="kredit" className="block text-sm font-medium text-gray-700">
+                Kredit limit
+              </label>
+              <div className="mt-1">
+                <input
+                  type="number"
+                  name="kredit"
+                  id="kredit"
+                  min={0}
+                  step={0.01}
+                  value={formData.kredit}
+                  onChange={(e) => handleInputChange('kredit')(parseFloat(e.target.value))}
+                  className="px-3 py-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                />
+              </div>
+              <p className="mt-2 text-sm text-gray-500">Maksimalni kredit za partnera u RSD</p>
+            </div>
           </div>
-        </DynFieldContainer>
+        </fieldset>
 
         {/* === NAPOMENA === */}
-        <DynFieldContainer title="Napomena">
-          <DynTextArea
-            name="napomena"
-            label="Napomena"
-            rows={4}
-            maxLength={500}
-            showCharacterCount
-            resize="vertical"
-            autoResize={false}
-            value={formData.napomena}
-            onChange={handleInputChange('napomena')}
-            placeholder="Dodatne informacije o partneru, uslovi saradnje, kontakt detalji..."
-            help="Opcionalne napomene i komentari (maksimalno 500 karaktera)"
-          />
+        <fieldset className="border rounded-md p-4">
+          <legend className="text-lg font-medium px-2">Napomena</legend>
+          <div>
+            <textarea
+              name="napomena"
+              id="napomena"
+              rows={4}
+              maxLength={500}
+              value={formData.napomena}
+              onChange={(e) => handleInputChange('napomena')(e.target.value)}
+              placeholder="Dodatne informacije o partneru, uslovi saradnje, kontakt detalji..."
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm resize-y"
+            />
+            <p className="mt-2 text-sm text-gray-500">Opcionalne napomene i komentari (maksimalno 500 karaktera)</p>
+          </div>
+        </fieldset>
 
         {/* === FORM ACTIONS === */}
         <div className="flex justify-end space-x-4 mt-8 pt-6 border-t border-gray-200">
-          <DynButton
-            variant="secondary"
+          <button
+            type="button"
+            className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md shadow-sm text-sm"
             onClick={onCancel}
             disabled={loading}
-            type="button"
           >
             Otkaži
-          </DynButton>
+          </button>
           
-          <DynButton
+          <button
             type="submit"
-            variant="primary"
-            loading={loading}
-            disabled={!formData.sifraPartner || !formData.nazivPartnera || !formData.pib}
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md shadow-sm text-sm disabled:opacity-50"
+            disabled={loading || !formData.sifraPartner || !formData.nazivPartnera || !formData.pib}
           >
             {isEditMode ? 'Ažuriraj partnera' : 'Kreiraj partnera'}
-          </DynButton>
+          </button>
         </div>
       </form>
-    </DynPage>
+    </div>
   );
 };

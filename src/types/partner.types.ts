@@ -32,9 +32,9 @@ export interface Partner {
   nazivVrstePartnera?: string;
   proizvodjac?: number;
   brojUgovora?: string;
-  datumUgovora?: Date;
+  datumUgovora?: Date | null;
   kredit: number;
-  datumOtvaranja?: Date;
+  datumOtvaranja?: Date | null;
   njihovaSifraZaNas?: string;
   bezZabrane?: number;
   tolerancijaValute?: number;
@@ -68,9 +68,9 @@ export interface PartnerCreateDto {
   idVrstaPartnera: number;
   proizvodjac?: number;
   brojUgovora?: string;
-  datumUgovora?: Date;
+  datumUgovora?: Date | null;
   kredit?: number;
-  datumOtvaranja?: Date;
+  datumOtvaranja?: Date | null;
   njihovaSifraZaNas?: string;
   bezZabrane?: number;
   tolerancijaValute?: number;
